@@ -2,7 +2,6 @@ package ua.com.javarush.alexbezruk.island.terrain;
 
 import ua.com.javarush.alexbezruk.island.logic.NumberGenerator;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.Animal;
-import ua.com.javarush.alexbezruk.island.wildlife.animal.herbivores.*;
 import ua.com.javarush.alexbezruk.island.wildlife.plant.Plant;
 
 import java.lang.reflect.Field;
@@ -25,7 +24,7 @@ public class Island {
         }
     }
 
-    public PieceOfLand[][] getIsland() {
+    public PieceOfLand[][] get() {
         return island;
     }
 

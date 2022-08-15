@@ -1,5 +1,6 @@
 package ua.com.javarush.alexbezruk.island;
 
+import ua.com.javarush.alexbezruk.island.statistics.Statistics;
 import ua.com.javarush.alexbezruk.island.terrain.Island;
 
 public class Main {
@@ -7,6 +8,6 @@ public class Main {
         Island island = new Island();
         island.settlement();
 
-        System.out.println(island);
+        Statistics.outputOfDetailedStatistics(island);
     }
 }

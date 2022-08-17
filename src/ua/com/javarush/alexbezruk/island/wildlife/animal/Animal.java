@@ -1,28 +1,35 @@
 package ua.com.javarush.alexbezruk.island.wildlife.animal;
 
+import ua.com.javarush.alexbezruk.island.interfaces.Movable;
+import ua.com.javarush.alexbezruk.island.logic.DirectionsOfMovement;
+import ua.com.javarush.alexbezruk.island.logic.NumberGenerator;
+import ua.com.javarush.alexbezruk.island.terrain.Island;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.herbivores.*;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.predator.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public abstract class Animal {
-    private static int maxPopulation;
-    private static double maxSaturation;
+public abstract class Animal implements Movable {
+    protected int x;
+    protected int y;
 
-    private static double weight;
-    private static int speed;
-    private double saturation;
+    protected double weight;
+    protected int speed;
+    protected double saturation;
+    protected double maxSaturation;
+    protected int maxPopulation;
 
-    public Animal(double saturation) {
+    public Animal(int x, int y, double weight, int speed, double saturation, double maxSaturation, int maxPopulation) {
+        this.x = x;
+        this.y = y;
+        this.weight = weight;
+        this.speed = speed;
         this.saturation = saturation;
-    }
-
-    @Override
-    public String toString() {
-        return  getClass().getSimpleName() + "{" +
-                "saturation=" + saturation +
-                '}';
+        this.maxSaturation = maxSaturation;
+        this.maxPopulation = maxPopulation;
     }
 
     private static Map<Integer, Class<?>> mapOfAnimals = new HashMap<>() {{
@@ -61,11 +68,26 @@ public abstract class Animal {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 100}
     };
 
+    @Override
+    public String toString() {
+        return  getClass().getSimpleName() + "{" +
+                "saturation=" + saturation +
+                '}';
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
     public double getWeight() {
         return weight;
     }
 
-    public static int getMaxPopulation() {
+    public int getMaxPopulation() {
         return maxPopulation;
     }
 
@@ -73,7 +95,7 @@ public abstract class Animal {
         return speed;
     }
 
-    public static double getMaxSaturation() {
+    public double getMaxSaturation() {
         return maxSaturation;
     }
 
@@ -91,5 +113,52 @@ public abstract class Animal {
 
     public static int[][] getProbabilityOfBeingEaten() {
         return probabilityOfBeingEaten;
+    }
+
+    @Override
+    public void move() {
+        for (int i = 0; i < getSpeed(); i++) {
+            List<DirectionsOfMovement> possibleDirectionsOfMovement = calculationOfPossibleDirectionsOfMovement();
+            int randomNumber = NumberGenerator.randomNumber(possibleDirectionsOfMovement.size() - 1);
+            switch (possibleDirectionsOfMovement.get(randomNumber)) {
+                case LEFT -> moveLeft();
+                case UP -> moveUp();
+                case RIGHT -> moveRight();
+                case DOWN -> moveDown();
+            }
+        }
+    }
+
+    private List<DirectionsOfMovement> calculationOfPossibleDirectionsOfMovement() {
+        List<DirectionsOfMovement> possibleDirectionsOfMovement = new ArrayList<>();
+        if (this.x != 0) {
+            possibleDirectionsOfMovement.add(DirectionsOfMovement.LEFT);
+        }
+        if (this.y != 0) {
+            possibleDirectionsOfMovement.add(DirectionsOfMovement.UP);
+        }
+        if (this.x != Island.getWidth() - 1) {
+            possibleDirectionsOfMovement.add(DirectionsOfMovement.RIGHT);
+        }
+        if (this.y != Island.getLength() - 1) {
+            possibleDirectionsOfMovement.add(DirectionsOfMovement.DOWN);
+        }
+        return possibleDirectionsOfMovement;
+    }
+
+    public void moveLeft() {
+        this.x--;
+    }
+
+    public void moveUp() {
+        this.y--;
+    }
+
+    public void moveRight() {
+        this.x++;
+    }
+
+    public void moveDown() {
+        this.y++;
     }
 }

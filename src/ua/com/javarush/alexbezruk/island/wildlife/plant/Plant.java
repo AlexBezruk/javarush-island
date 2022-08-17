@@ -1,8 +1,8 @@
 package ua.com.javarush.alexbezruk.island.wildlife.plant;
 
 public class Plant {
-    private final double weight = 1;
-    private final static int maxPopulation = 200;
+    protected static double weight = 1;
+    protected static int maxPopulation = 200;
 
     public double getWeight() {
         return weight;
@@ -16,4 +16,6 @@ public class Plant {
     public String toString() {
         return "Plant{}";
     }
+
+
 }

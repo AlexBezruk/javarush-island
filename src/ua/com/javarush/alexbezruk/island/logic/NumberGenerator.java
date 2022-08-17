@@ -7,4 +7,9 @@ public class NumberGenerator {
         Random random = new Random();
         return min + random.nextInt(max + 1);
     }
+
+    public static int randomNumber(int max) {
+        Random random = new Random();
+        return random.nextInt(max + 1);
+    }
 }

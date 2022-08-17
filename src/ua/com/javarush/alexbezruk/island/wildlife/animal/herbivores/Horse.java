@@ -1,12 +1,12 @@
 package ua.com.javarush.alexbezruk.island.wildlife.animal.herbivores;
 
 public class Horse extends Herbivores {
-    private final static double weight = 400;
-    private final static int maxPopulation = 20;
-    private final static int speed = 4;
-    private final static double maxSaturation = 60;
+    protected static double weight = 400;
+    protected static int speed = 4;
+    protected static double maxSaturation = 60;
+    protected static int maxPopulation = 20;
 
-    public Horse() {
-        super(maxSaturation);
+    public Horse(int x, int y) {
+        super(x, y, weight, speed, maxSaturation, maxSaturation, maxPopulation);
     }
 }

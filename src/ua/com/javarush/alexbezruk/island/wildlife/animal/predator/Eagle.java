@@ -1,12 +1,12 @@
 package ua.com.javarush.alexbezruk.island.wildlife.animal.predator;
 
 public class Eagle extends Predator {
-    private final static double weight = 6;
-    private final static int maxPopulation = 20;
-    private final static int speed = 3;
-    private final static double maxSaturation = 1;
+    protected static double weight = 6;
+    protected static int speed = 3;
+    protected static double maxSaturation = 1;
+    protected static int maxPopulation = 20;
 
-    public Eagle() {
-        super(maxSaturation);
+    public Eagle(int x, int y) {
+        super(x, y, weight, speed, maxSaturation, maxSaturation, maxPopulation);
     }
 }

@@ -1,12 +1,12 @@
 package ua.com.javarush.alexbezruk.island.wildlife.animal.herbivores;
 
 public class Deer extends Herbivores {
-    private final static double weight = 300;
-    private final static int maxPopulation = 20;
-    private final static int speed = 4;
-    private final static double maxSaturation = 50;
+    protected static double weight = 300;
+    protected static int speed = 4;
+    protected static double maxSaturation = 50;
+    protected static int maxPopulation = 20;
 
-    public Deer() {
-        super(maxSaturation);
+    public Deer(int x, int y) {
+        super(x, y, weight, speed, maxSaturation, maxSaturation, maxPopulation);
     }
 }

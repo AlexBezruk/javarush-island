@@ -1,12 +1,12 @@
 package ua.com.javarush.alexbezruk.island.wildlife.animal.herbivores;
 
 public class Mouse extends Herbivores {
-    private final static double weight = 0.05;
-    private final static int maxPopulation = 500;
-    private final static int speed = 1;
-    private final static double maxSaturation = 0.01;
+    protected static double weight = 0.05;
+    protected static int speed = 1;
+    protected static double maxSaturation = 0.01;
+    protected static int maxPopulation = 500;
 
-    public Mouse() {
-        super(maxSaturation);
+    public Mouse(int x, int y) {
+        super(x, y, weight, speed, maxSaturation, maxSaturation, maxPopulation);
     }
 }

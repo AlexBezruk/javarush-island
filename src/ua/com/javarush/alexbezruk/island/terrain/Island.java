@@ -24,6 +24,14 @@ public class Island {
         }
     }
 
+    public static int getWidth() {
+        return WIDTH;
+    }
+
+    public static int getLength() {
+        return LENGTH;
+    }
+
     public PieceOfLand[][] get() {
         return island;
     }
@@ -54,7 +62,7 @@ public class Island {
 
                     for (int j = 0; j < NumberGenerator.randomNumber(0, maxPopulation); j++) {
                         try {
-                            Animal animal = (Animal) clazz.getConstructor().newInstance();
+                            Animal animal = (Animal) clazz.getConstructor(int.class, int.class).newInstance(x, y);
                             pieceOfLand.animals.add(animal);
                         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                             System.err.println(e.getMessage());

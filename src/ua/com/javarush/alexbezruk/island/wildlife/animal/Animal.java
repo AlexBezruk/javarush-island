@@ -1,6 +1,7 @@
 package ua.com.javarush.alexbezruk.island.wildlife.animal;
 
 import ua.com.javarush.alexbezruk.island.interfaces.Movable;
+import ua.com.javarush.alexbezruk.island.interfaces.Multipliable;
 import ua.com.javarush.alexbezruk.island.logic.DirectionsOfMovement;
 import ua.com.javarush.alexbezruk.island.logic.NumberGenerator;
 import ua.com.javarush.alexbezruk.island.terrain.Island;
@@ -12,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Animal implements Movable {
+public abstract class Animal implements Cloneable, Movable, Multipliable {
     protected int x;
     protected int y;
 
@@ -129,6 +130,18 @@ public abstract class Animal implements Movable {
         }
     }
 
+    @Override
+    public Animal multiply() {
+        Animal animal = null;
+        try {
+            animal = (Animal) this.clone();
+            animal.saturation = animal.maxSaturation;
+        } catch (CloneNotSupportedException e) {
+            System.err.println("Ошибка при размножении (клонировании) животного" + e.getMessage());
+        }
+        return animal;
+    }
+
     private List<DirectionsOfMovement> calculationOfPossibleDirectionsOfMovement() {
         List<DirectionsOfMovement> possibleDirectionsOfMovement = new ArrayList<>();
         if (this.x != 0) {
@@ -146,19 +159,19 @@ public abstract class Animal implements Movable {
         return possibleDirectionsOfMovement;
     }
 
-    public void moveLeft() {
+    private void moveLeft() {
         this.x--;
     }
 
-    public void moveUp() {
+    private void moveUp() {
         this.y--;
     }
 
-    public void moveRight() {
+    private void moveRight() {
         this.x++;
     }
 
-    public void moveDown() {
+    private void moveDown() {
         this.y++;
     }
 }

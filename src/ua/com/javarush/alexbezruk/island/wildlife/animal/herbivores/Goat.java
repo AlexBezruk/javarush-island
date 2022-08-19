@@ -7,6 +7,6 @@ public class Goat extends Herbivores {
     protected static int maxPopulation = 140;
 
     public Goat(int x, int y) {
-        super(x, y, weight, speed, maxSaturation, maxSaturation, maxPopulation);
+        super(x, y, weight, speed, 0.75 * maxSaturation, maxSaturation, maxPopulation);
     }
 }

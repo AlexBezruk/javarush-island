@@ -1,33 +1,97 @@
 package ua.com.javarush.alexbezruk.island.statistics;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ua.com.javarush.alexbezruk.island.logic.IslandSimulation;
 import ua.com.javarush.alexbezruk.island.terrain.Island;
 import ua.com.javarush.alexbezruk.island.terrain.PieceOfLand;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.Animal;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.herbivores.*;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.predator.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Statistics {
-    public static void generalStatisticsOutput(Island island) {
-        int numberOfAnimals = countingTotalNumberOfAnimals(countingNumberOfAnimalsBySpecies(island));
-        int numberOfPlants = countingNumberOfPlants(island);
+    public static final String PATH_TO_INITIAL_DATA = "src/ua/com/javarush/alexbezruk/island/resources/initialStatistics.json";
+    private int numberOfDeadAnimals;
+    private int numberOfAnimalsBorn;
+    private Map<Class<? extends Animal>, Integer> animalsBySpecies;
 
-        System.out.printf("В настоящее время на острове %d животных и %d растений\n", numberOfAnimals, numberOfPlants);
+    public Statistics() {
     }
 
-    public static void outputOfDetailedStatistics(Island island) {
-        System.out.println("В настоящее время на острове:\n");
+    public Statistics(Island island) {
+        numberOfAnimalsBorn = 0;
+        numberOfDeadAnimals = 0;
+        animalsBySpecies = countingNumberOfAnimalsBySpecies(island);
+    }
+
+    public int getNumberOfDeadAnimals() {
+        return numberOfDeadAnimals;
+    }
+
+    public int getNumberOfAnimalsBorn() {
+        return numberOfAnimalsBorn;
+    }
+
+    public Map<Class<? extends Animal>, Integer> getAnimalsBySpecies() {
+        return animalsBySpecies;
+    }
+
+    public void incrementNumberOfDeadAnimals() {
+        numberOfDeadAnimals++;
+    }
+
+    public void incrementNumberOfAnimalsBorn() {
+        numberOfAnimalsBorn++;
+    }
+
+    public void generalStatisticsOutput() {
+        int numberOfAnimals = countingTotalNumberOfAnimals();
+        System.out.printf("В настоящее время на острове %d животных\n", numberOfAnimals);
         System.out.println("Animals: ");
-        for (Map.Entry<Class<? extends Animal>, Integer> entry : countingNumberOfAnimalsBySpecies(island).entrySet()) {
+        for (Map.Entry<Class<? extends Animal>, Integer> entry : animalsBySpecies.entrySet()) {
             System.out.printf("%s - %d\n", entry.getKey().getSimpleName(), entry.getValue());
         }
-        System.out.println();
-        System.out.printf("Plants - %d\n", countingNumberOfPlants(island));
+
+        System.out.printf("\nЗа сутки родилось %d животных\n", numberOfAnimalsBorn);
+        System.out.printf("За сутки умерло %d животных\n", numberOfDeadAnimals);
     }
 
-    private static Map<Class<? extends Animal>, Integer> countingNumberOfAnimalsBySpecies(Island island) {
+    public void outputOfStatisticsOnGrowthOfAnimals() {
+        Map<Class<? extends Animal>, Integer> growthOfAnimals = readingInitialStateOfIsland();
+
+        System.out.printf("\nПрирост животных составил: ");
+        System.out.println("Animals: ");
+        for (Map.Entry<Class<? extends Animal>, Integer> entry : this.getAnimalsBySpecies().entrySet()) {
+            System.out.printf("%s - %d\n", entry.getKey().getSimpleName(), entry.getValue() - growthOfAnimals.get(entry.getKey()));
+        }
+    }
+
+    public void preservingInitialStateOfIsland() {
+        ObjectMapper mapper = new ObjectMapper();
+        File file = new File(PATH_TO_INITIAL_DATA);
+        try {
+            mapper.writeValue(file, this);
+        } catch (IOException e) {
+            System.err.println("Ошибка при записи данных в Json-файл " + e.getMessage());
+        }
+    }
+
+    private Map<Class<? extends Animal>, Integer> readingInitialStateOfIsland() {
+        ObjectMapper mapper = new ObjectMapper();
+        File file = new File(PATH_TO_INITIAL_DATA);
+        try {
+            return mapper.readValue(file, Statistics.class).getAnimalsBySpecies();
+        } catch (IOException e) {
+            System.err.println("Ошибка при записи данных в Json-файл " + e.getMessage());
+            return null;
+        }
+    }
+
+    private Map<Class<? extends Animal>, Integer> countingNumberOfAnimalsBySpecies(Island island) {
         Map<Class<? extends Animal>, Integer> map = new HashMap<>();
         map.put(Wolf.class, 0);
         map.put(Boa.class, 0);
@@ -61,24 +125,23 @@ public class Statistics {
         return map;
     }
 
-    private static int countingTotalNumberOfAnimals(Map<Class<? extends Animal>, Integer> map) {
+    private int countingTotalNumberOfAnimals() {
         int sum = 0;
-        for (Integer count : map.values()) {
+        for (Integer count : animalsBySpecies.values()) {
             sum += count;
         }
         return sum;
     }
 
-    private static int countingNumberOfPlants(Island island) {
-        int sum = 0;
+    private Map<Class<? extends Animal>, Integer> countingGrowthOfAnimals(
+            Map<Class<? extends Animal>, Integer> beginning) {
 
-        for (int y = 0; y < island.get().length; y++) {
-            for (int x = 0; x < island.get()[y].length; x++) {
-                PieceOfLand pieceOfLand = island.get()[y][x];
-                sum += pieceOfLand.getPlants().size();
-            }
+        Map<Class<? extends Animal>, Integer> map = new HashMap<>();
+
+        for (Class<? extends Animal> clazz : animalsBySpecies.keySet()) {
+            map.put(clazz, animalsBySpecies.get(clazz) - beginning.get(clazz));
         }
 
-        return sum;
+        return map;
     }
 }

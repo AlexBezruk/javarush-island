@@ -7,6 +7,6 @@ public class Buffalo extends Herbivores {
     protected static int maxPopulation = 10;
 
     public Buffalo(int x, int y) {
-        super(x, y, weight, speed, maxSaturation, maxSaturation, maxPopulation);
+        super(x, y, weight, speed, maxSaturation, 0.75 * maxSaturation, maxPopulation);
     }
 }

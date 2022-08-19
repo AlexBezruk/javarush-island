@@ -11,11 +11,4 @@ public class Plant {
     public static int getMaxPopulation() {
         return maxPopulation;
     }
-
-    @Override
-    public String toString() {
-        return "Plant{}";
-    }
-
-
 }

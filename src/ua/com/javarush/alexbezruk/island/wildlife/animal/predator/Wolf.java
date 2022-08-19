@@ -7,6 +7,6 @@ public class Wolf extends Predator {
     protected static double maxSaturation = 80;
 
     public Wolf(int x, int y) {
-        super(x, y, weight, speed, maxSaturation, maxSaturation, maxPopulation);
+        super(x, y, weight, speed, 0.75 * maxSaturation, maxSaturation, maxPopulation);
     }
 }

@@ -7,6 +7,6 @@ public class Eagle extends Predator {
     protected static int maxPopulation = 20;
 
     public Eagle(int x, int y) {
-        super(x, y, weight, speed, maxSaturation, maxSaturation, maxPopulation);
+        super(x, y, weight, speed, 0.75 * maxSaturation, maxSaturation, maxPopulation);
     }
 }

@@ -1,5 +1,6 @@
 package ua.com.javarush.alexbezruk.island.wildlife.animal;
 
+import ua.com.javarush.alexbezruk.island.interfaces.Eatable;
 import ua.com.javarush.alexbezruk.island.interfaces.Movable;
 import ua.com.javarush.alexbezruk.island.interfaces.Multipliable;
 import ua.com.javarush.alexbezruk.island.logic.DirectionsOfMovement;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Animal implements Cloneable, Movable, Multipliable {
+public abstract class Animal implements Cloneable, Movable, Multipliable, Eatable {
     protected int x;
     protected int y;
 
@@ -23,6 +24,9 @@ public abstract class Animal implements Cloneable, Movable, Multipliable {
     protected double maxSaturation;
     protected int maxPopulation;
 
+    protected boolean isAlive;
+    protected boolean isMoved;
+
     public Animal(int x, int y, double weight, int speed, double saturation, double maxSaturation, int maxPopulation) {
         this.x = x;
         this.y = y;
@@ -31,6 +35,8 @@ public abstract class Animal implements Cloneable, Movable, Multipliable {
         this.saturation = saturation;
         this.maxSaturation = maxSaturation;
         this.maxPopulation = maxPopulation;
+        isAlive = true;
+        isMoved = false;
     }
 
     private static Map<Integer, Class<?>> mapOfAnimals = new HashMap<>() {{
@@ -68,13 +74,6 @@ public abstract class Animal implements Cloneable, Movable, Multipliable {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 90, 100},
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 100}
     };
-
-    @Override
-    public String toString() {
-        return  getClass().getSimpleName() + "{" +
-                "saturation=" + saturation +
-                '}';
-    }
 
     public int getX() {
         return x;
@@ -140,6 +139,13 @@ public abstract class Animal implements Cloneable, Movable, Multipliable {
             System.err.println("Ошибка при размножении (клонировании) животного" + e.getMessage());
         }
         return animal;
+    }
+
+    @Override
+    public void eat(Object o) {
+        Animal animal = (Animal) o;
+        animal.isAlive = false;
+        animal.isMoved = true;
     }
 
     private List<DirectionsOfMovement> calculationOfPossibleDirectionsOfMovement() {

@@ -7,6 +7,6 @@ public class Caterpillar extends Herbivores {
     protected static int maxPopulation = 1000;
 
     public Caterpillar(int x, int y) {
-        super(x, y, weight, speed, maxSaturation, maxSaturation, maxPopulation);
+        super(x, y, weight, speed, 0.75 * maxSaturation, maxSaturation, maxPopulation);
     }
 }

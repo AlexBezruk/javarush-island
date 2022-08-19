@@ -7,6 +7,6 @@ public class Mouse extends Herbivores {
     protected static int maxPopulation = 500;
 
     public Mouse(int x, int y) {
-        super(x, y, weight, speed, maxSaturation, maxSaturation, maxPopulation);
+        super(x, y, weight, speed, 0.75 * maxSaturation, maxSaturation, maxPopulation);
     }
 }

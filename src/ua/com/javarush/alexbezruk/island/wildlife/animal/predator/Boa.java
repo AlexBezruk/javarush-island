@@ -7,6 +7,6 @@ public class Boa extends Predator {
     protected static int maxPopulation = 30;
 
     public Boa(int x, int y) {
-        super(x, y, weight, speed, maxSaturation, maxSaturation, maxPopulation);
+        super(x, y, weight, speed, 0.75 * maxSaturation, maxSaturation, maxPopulation);
     }
 }

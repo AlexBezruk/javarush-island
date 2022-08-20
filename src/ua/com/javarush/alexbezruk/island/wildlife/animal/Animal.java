@@ -5,7 +5,9 @@ import ua.com.javarush.alexbezruk.island.interfaces.Movable;
 import ua.com.javarush.alexbezruk.island.interfaces.Multipliable;
 import ua.com.javarush.alexbezruk.island.logic.DirectionsOfMovement;
 import ua.com.javarush.alexbezruk.island.logic.NumberGenerator;
+import ua.com.javarush.alexbezruk.island.statistics.Statistics;
 import ua.com.javarush.alexbezruk.island.terrain.Island;
+import ua.com.javarush.alexbezruk.island.wildlife.WildLife;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.herbivores.*;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.predator.*;
 
@@ -14,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Animal implements Cloneable, Movable, Multipliable, Eatable {
+public abstract class Animal extends WildLife implements Cloneable, Movable, Multipliable, Eatable {
     protected int x;
     protected int y;
 
@@ -24,8 +26,11 @@ public abstract class Animal implements Cloneable, Movable, Multipliable, Eatabl
     protected double maxSaturation;
     protected int maxPopulation;
 
-    protected boolean isAlive;
-    protected boolean isMoved;
+    public boolean isAlive;
+    public boolean isMoved;
+    public boolean isMultiplied;
+
+    public boolean isEated;
 
     public Animal(int x, int y, double weight, int speed, double saturation, double maxSaturation, int maxPopulation) {
         this.x = x;
@@ -37,9 +42,11 @@ public abstract class Animal implements Cloneable, Movable, Multipliable, Eatabl
         this.maxPopulation = maxPopulation;
         isAlive = true;
         isMoved = false;
+        isMultiplied = false;
+        isEated = false;
     }
 
-    private static Map<Integer, Class<?>> mapOfAnimals = new HashMap<>() {{
+    private static Map<Integer, Class<? extends Animal>> mapOfAnimals = new HashMap<>() {{
         put(0, Wolf.class);
         put(1, Boa.class);
         put(2, Fox.class);
@@ -72,7 +79,7 @@ public abstract class Animal implements Cloneable, Movable, Multipliable, Eatabl
             {0, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, -1, 0, 0, 90, 100},
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 100},
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 90, 100},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 100}
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 100},
     };
 
     public int getX() {
@@ -103,11 +110,15 @@ public abstract class Animal implements Cloneable, Movable, Multipliable, Eatabl
         return saturation;
     }
 
+    public void setSaturation(double saturation) {
+        this.saturation = saturation;
+    }
+
     public double reducingSaturation() {
         return saturation - maxSaturation / 4;
     }
 
-    public static Map<Integer, Class<?>> getMapOfAnimals() {
+    public static Map<Integer, Class<? extends Animal>> getMapOfAnimals() {
         return mapOfAnimals;
     }
 
@@ -134,7 +145,10 @@ public abstract class Animal implements Cloneable, Movable, Multipliable, Eatabl
         Animal animal = null;
         try {
             animal = (Animal) this.clone();
+            Statistics.incrementNumberOfAnimalsBorn();
             animal.saturation = animal.maxSaturation;
+            isMoved = true;
+            isMultiplied = true;
         } catch (CloneNotSupportedException e) {
             System.err.println("Ошибка при размножении (клонировании) животного" + e.getMessage());
         }
@@ -145,7 +159,7 @@ public abstract class Animal implements Cloneable, Movable, Multipliable, Eatabl
     public void eat(Object o) {
         Animal animal = (Animal) o;
         animal.isAlive = false;
-        animal.isMoved = true;
+        Statistics.incrementNumberOfDeadAnimals();
     }
 
     private List<DirectionsOfMovement> calculationOfPossibleDirectionsOfMovement() {
@@ -156,10 +170,10 @@ public abstract class Animal implements Cloneable, Movable, Multipliable, Eatabl
         if (this.y != 0) {
             possibleDirectionsOfMovement.add(DirectionsOfMovement.UP);
         }
-        if (this.x != Island.getWidth() - 1) {
+        if (this.x != Island.getLength() - 1) {
             possibleDirectionsOfMovement.add(DirectionsOfMovement.RIGHT);
         }
-        if (this.y != Island.getLength() - 1) {
+        if (this.y != Island.getWidth() - 1) {
             possibleDirectionsOfMovement.add(DirectionsOfMovement.DOWN);
         }
         return possibleDirectionsOfMovement;

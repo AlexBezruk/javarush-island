@@ -15,37 +15,32 @@ import java.util.Map;
 
 public class Statistics {
     public static final String PATH_TO_INITIAL_DATA = "src/ua/com/javarush/alexbezruk/island/resources/initialStatistics.json";
-    private int numberOfDeadAnimals;
-    private int numberOfAnimalsBorn;
+    private static int numberOfDeadAnimals;
+    private static int numberOfAnimalsBorn;
     private Map<Class<? extends Animal>, Integer> animalsBySpecies;
 
     public Statistics() {
     }
 
     public Statistics(Island island) {
-        numberOfAnimalsBorn = 0;
-        numberOfDeadAnimals = 0;
         animalsBySpecies = countingNumberOfAnimalsBySpecies(island);
-    }
-
-    public int getNumberOfDeadAnimals() {
-        return numberOfDeadAnimals;
-    }
-
-    public int getNumberOfAnimalsBorn() {
-        return numberOfAnimalsBorn;
     }
 
     public Map<Class<? extends Animal>, Integer> getAnimalsBySpecies() {
         return animalsBySpecies;
     }
 
-    public void incrementNumberOfDeadAnimals() {
+    public static void incrementNumberOfDeadAnimals() {
         numberOfDeadAnimals++;
     }
 
-    public void incrementNumberOfAnimalsBorn() {
+    public static void incrementNumberOfAnimalsBorn() {
         numberOfAnimalsBorn++;
+    }
+
+    public static void zeroingNumberOfDeadAndBornAnimals() {
+        numberOfAnimalsBorn = 0;
+        numberOfDeadAnimals = 0;
     }
 
     public void generalStatisticsOutput() {
@@ -66,7 +61,7 @@ public class Statistics {
         System.out.printf("\nПрирост животных составил: ");
         System.out.println("Animals: ");
         for (Map.Entry<Class<? extends Animal>, Integer> entry : this.getAnimalsBySpecies().entrySet()) {
-            System.out.printf("%s - %d\n", entry.getKey().getSimpleName(), entry.getValue() - growthOfAnimals.get(entry.getKey()));
+            System.out.printf("%s: %d\n", entry.getKey().getSimpleName(), entry.getValue() - growthOfAnimals.get(entry.getKey()));
         }
     }
 

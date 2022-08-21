@@ -50,16 +50,17 @@ public class Statistics {
         for (Map.Entry<Class<? extends Animal>, Integer> entry : animalsBySpecies.entrySet()) {
             System.out.printf("%s - %d\n", entry.getKey().getSimpleName(), entry.getValue());
         }
+    }
 
-        System.out.printf("\nЗа сутки родилось %d животных\n", numberOfAnimalsBorn);
+    public void conclusionOfStatisticsOnNumberOfDeadAndBornAnimals() {
+        System.out.printf("За сутки родилось %d животных\n", numberOfAnimalsBorn);
         System.out.printf("За сутки умерло %d животных\n", numberOfDeadAnimals);
     }
 
     public void outputOfStatisticsOnGrowthOfAnimals() {
         Map<Class<? extends Animal>, Integer> growthOfAnimals = readingInitialStateOfIsland();
 
-        System.out.printf("\nПрирост животных составил: ");
-        System.out.println("Animals: ");
+        System.out.printf("Прирост животных составил:\n");
         for (Map.Entry<Class<? extends Animal>, Integer> entry : this.getAnimalsBySpecies().entrySet()) {
             System.out.printf("%s: %d\n", entry.getKey().getSimpleName(), entry.getValue() - growthOfAnimals.get(entry.getKey()));
         }
@@ -126,17 +127,5 @@ public class Statistics {
             sum += count;
         }
         return sum;
-    }
-
-    private Map<Class<? extends Animal>, Integer> countingGrowthOfAnimals(
-            Map<Class<? extends Animal>, Integer> beginning) {
-
-        Map<Class<? extends Animal>, Integer> map = new HashMap<>();
-
-        for (Class<? extends Animal> clazz : animalsBySpecies.keySet()) {
-            map.put(clazz, animalsBySpecies.get(clazz) - beginning.get(clazz));
-        }
-
-        return map;
     }
 }

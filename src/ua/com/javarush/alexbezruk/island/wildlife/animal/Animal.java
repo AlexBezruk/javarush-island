@@ -29,7 +29,6 @@ public abstract class Animal extends WildLife implements Cloneable, Movable, Mul
     public boolean isAlive;
     public boolean isMoved;
     public boolean isMultiplied;
-
     public boolean isEated;
 
     public Animal(int x, int y, double weight, int speed, double saturation, double maxSaturation, int maxPopulation) {

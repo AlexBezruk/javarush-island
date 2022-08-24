@@ -7,24 +7,33 @@ import ua.com.javarush.alexbezruk.island.wildlife.WildLife;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.Animal;
 import ua.com.javarush.alexbezruk.island.wildlife.plant.Plant;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class IslandSimulation {
     private static int DAY = 0;
     private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    private static final String PATH_TO_DATA = "src/ua/com/javarush/alexbezruk/island/resources/data.properties";
+    private static Properties initialData;
+
+    public IslandSimulation() {
+        initialData = getProperties();
+    }
+
+    public static Properties getInitialData() {
+        return initialData;
+    }
 
     public static void start() {
+        IslandSimulation islandSimulation = new IslandSimulation();
         Island island = new Island();
-        settlement(island);
+        islandSimulation.settlement(island);
+        System.out.println("Остров создан и заселен животными");
 
         Statistics initialStatistics = new Statistics(island);
-        initialStatistics.generalStatisticsOutput();
-        initialStatistics.preservingInitialStateOfIsland();
+        initialStatistics.outputGeneral();
+        initialStatistics.saveInitialStateOfIsland();
 
         System.out.println("\nЗапускаем симуляцию жизни острова...\n");
 
@@ -34,6 +43,79 @@ public class IslandSimulation {
             System.out.printf("Прошел день №%d", DAY);
             menuOutput(island);
         }
+    }
+
+    private Properties getProperties() {
+        File file = new File(PATH_TO_DATA);
+        Properties properties = new Properties();
+        try {
+            properties.load(new FileReader(file));
+        } catch (IOException e) {
+            System.err.println("Ошибка при чтении данных из properties " + e.getMessage());
+        }
+        return properties;
+    }
+
+    private void settlement(Island island) {
+        for (int y = 0; y < Island.getWidth(); y++) {
+            for (int x = 0; x < Island.getLength(); x++) {
+                PieceOfLand pieceOfLand = island.get()[x][y];
+                Properties properties = IslandSimulation.getInitialData();
+
+                for (int i = 0; i < Animal.getListOfAnimals().size(); i++) {
+                    Class<?> clazz = Animal.getListOfAnimals().get(i);
+                    int maxPopulation = Integer.parseInt(properties.getProperty(clazz.getSimpleName() + ".maxPopulation"));
+
+                    for (int j = 0; j < NumberGenerator.randomNumber(maxPopulation); j++) {
+                        try {
+                            Animal animal = (Animal) clazz.getConstructor(int.class, int.class).newInstance(x, y);
+                            pieceOfLand.getAnimals().add(animal);
+                        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                            System.err.println("Ошибка при создании объекта" + e.getMessage());
+                        }
+                    }
+                }
+
+                Collections.shuffle(pieceOfLand.getAnimals());
+
+                int maxPopulation = Integer.parseInt(properties.getProperty("Plant.maxPopulation"));
+                for (int i = 0; i < NumberGenerator.randomNumber(maxPopulation); i++) {
+                    pieceOfLand.getPlants().add(new Plant());
+                }
+            }
+        }
+    }
+
+    private static void simulationOfOneDay(Island island) {
+        Statistics.zeroingNumberOfDeadAndBornAnimals();
+
+        for (int y = 0; y < Island.getWidth(); y++) {
+            for (int x = 0; x < Island.getLength(); x++) {
+                List<Animal> animals = island.get()[x][y].getAnimals();
+                List<Plant> plants = island.get()[x][y].getPlants();
+                for (int i = 0; i < animals.size(); i++) {
+                    Animal animal = animals.get(i);
+
+                    List<Integer> operations = new ArrayList<>();
+                    operations.add(0);
+                    operations.add(1);
+                    operations.add(2);
+
+                    for (int j = 0; j < operations.size(); j++) {
+                        int randomNumber = NumberGenerator.randomNumber(operations.size() - 1);
+                        switch (operations.get(randomNumber)) {
+                            case 0 -> animalMove(animal, animals, island);
+                            case 1 -> animalMultiply(animal, animals);
+                            case 2 -> animalEat(animal, animals, plants, island);
+                        }
+                        operations.remove(operations.get(randomNumber));
+                    }
+                }
+            }
+        }
+
+        reducingSaturationAndremoveDeadAnimals(island);
+        plantGrowth(island);
     }
 
     private static void menuOutput(Island island) {
@@ -78,43 +160,11 @@ public class IslandSimulation {
             statisticsOutput(island);
         }
         switch (number) {
-            case 1 -> statistics.generalStatisticsOutput();
-            case 2 -> statistics.conclusionOfStatisticsOnNumberOfDeadAndBornAnimals();
-            case 3 -> statistics.outputOfStatisticsOnGrowthOfAnimals();
+            case 1 -> statistics.outputGeneral();
+            case 2 -> statistics.outputNumberOfBornAndDeadAnimals();
+            case 3 -> statistics.outputAnimalsGrowth();
         }
         menuOutput(island);
-    }
-
-    private static void simulationOfOneDay(Island island) {
-        Statistics.zeroingNumberOfDeadAndBornAnimals();
-
-        for (int y = 0; y < Island.getWidth(); y++) {
-            for (int x = 0; x < Island.getLength(); x++) {
-                List<Animal> animals = island.get()[x][y].getAnimals();
-                List<Plant> plants = island.get()[x][y].getPlants();
-                for (int i = 0; i < animals.size(); i++) {
-                    Animal animal = animals.get(i);
-
-                    List<Integer> operations = new ArrayList<>();
-                    operations.add(0);
-                    operations.add(1);
-                    operations.add(2);
-
-                    for (int j = 0; j < operations.size(); j++) {
-                        int randomNumber = NumberGenerator.randomNumber(operations.size() - 1);
-                        switch (operations.get(randomNumber)) {
-                            case 0 -> animalMove(animal, animals, island);
-                            case 1 -> animalMultiply(animal, animals);
-                            case 2 -> animalEat(animal, animals, plants, island);
-                        }
-                        operations.remove(operations.get(randomNumber));
-                    }
-                }
-            }
-        }
-
-        reducingSaturationAndremoveDeadAnimals(island);
-        plantGrowth(island);
     }
 
     private static void animalMove(Animal animal, List<Animal> animals, Island island) {
@@ -154,12 +204,7 @@ public class IslandSimulation {
     private static void animalEat(Animal animal, List<Animal> animals, List<Plant> plants, Island island) {
         if (animal.isAlive && !animal.isEated) {
             int randomNumber = NumberGenerator.randomNumber(100);
-            int key = -1;
-            for (Map.Entry<Integer, Class<? extends Animal>> entry : Animal.getMapOfAnimals().entrySet()) {
-                if (animal.getClass().equals(entry.getValue())) {
-                    key = entry.getKey();
-                }
-            }
+            int key = Animal.getListOfAnimals().indexOf(animal.getClass());
 
             List<Class<? extends WildLife>> list = new ArrayList<>();
             for (int j = 0; j < Animal.getProbabilityOfBeingEaten()[key].length; j++) {
@@ -167,7 +212,7 @@ public class IslandSimulation {
                     if (j == Animal.getProbabilityOfBeingEaten()[key].length - 1) {
                         list.add(Plant.class);
                     } else {
-                        list.add(Animal.getMapOfAnimals().get(j));
+                        list.add(Animal.getListOfAnimals().get(j));
                     }
                 }
             }
@@ -225,42 +270,6 @@ public class IslandSimulation {
                         animal.isMultiplied = false;
                         animal.isEated = false;
                     }
-                }
-            }
-        }
-    }
-
-    private static void settlement(Island island) {
-        for (int y = 0; y < Island.getWidth(); y++) {
-            for (int x = 0; x < Island.getLength(); x++) {
-                PieceOfLand pieceOfLand = island.get()[x][y];
-
-                for (int i = 0; i < Animal.getMapOfAnimals().size(); i++) {
-                    Class<?> clazz = Animal.getMapOfAnimals().get(i);
-                    int maxPopulation = 0;
-                    try {
-                        Field field = clazz.getDeclaredField("maxPopulation");
-                        field.setAccessible(true);
-                        maxPopulation = (int) field.get(clazz);
-                        field.setAccessible(false);
-                    } catch (NoSuchFieldException | IllegalAccessException e) {
-                        System.err.println("Ошибка при получении поля класса" + e.getMessage());
-                    }
-
-                    for (int j = 0; j < NumberGenerator.randomNumber(maxPopulation); j++) {
-                        try {
-                            Animal animal = (Animal) clazz.getConstructor(int.class, int.class).newInstance(x, y);
-                            pieceOfLand.getAnimals().add(animal);
-                        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                            System.err.println("Ошибка при создании объекта" + e.getMessage());
-                        }
-                    }
-                }
-
-                Collections.shuffle(pieceOfLand.getAnimals());
-
-                for (int i = 0; i < NumberGenerator.randomNumber(Plant.getMaxPopulation()); i++) {
-                    pieceOfLand.getPlants().add(new Plant());
                 }
             }
         }

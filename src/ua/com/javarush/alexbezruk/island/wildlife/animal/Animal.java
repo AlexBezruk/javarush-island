@@ -4,6 +4,7 @@ import ua.com.javarush.alexbezruk.island.interfaces.Eatable;
 import ua.com.javarush.alexbezruk.island.interfaces.Movable;
 import ua.com.javarush.alexbezruk.island.interfaces.Multipliable;
 import ua.com.javarush.alexbezruk.island.logic.DirectionsOfMovement;
+import ua.com.javarush.alexbezruk.island.logic.IslandSimulation;
 import ua.com.javarush.alexbezruk.island.logic.NumberGenerator;
 import ua.com.javarush.alexbezruk.island.statistics.Statistics;
 import ua.com.javarush.alexbezruk.island.terrain.Island;
@@ -11,10 +12,7 @@ import ua.com.javarush.alexbezruk.island.wildlife.WildLife;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.herbivores.*;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.predator.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Animal extends WildLife implements Cloneable, Movable, Multipliable, Eatable {
     protected int x;
@@ -31,37 +29,29 @@ public abstract class Animal extends WildLife implements Cloneable, Movable, Mul
     public boolean isMultiplied;
     public boolean isEated;
 
-    public Animal(int x, int y, double weight, int speed, double saturation, double maxSaturation, int maxPopulation) {
+    public Animal(int x, int y) {
         this.x = x;
         this.y = y;
-        this.weight = weight;
-        this.speed = speed;
-        this.saturation = saturation;
-        this.maxSaturation = maxSaturation;
-        this.maxPopulation = maxPopulation;
+        Properties properties = IslandSimulation.getInitialData();
+        String simpleName = getClass().getSimpleName();
+        try {
+            weight = Double.parseDouble(properties.getProperty(simpleName + ".weight"));
+            speed = Integer.parseInt(properties.getProperty(simpleName + ".speed"));
+            maxSaturation = Double.parseDouble(properties.getProperty(simpleName + ".maxSaturation"));
+            maxPopulation = Integer.parseInt(properties.getProperty(simpleName + ".maxPopulation"));
+        } catch (NumberFormatException e) {
+            System.err.println("Неверный формат данных в файле properties " + e.getMessage());
+        }
+        saturation = 0.75 * maxSaturation;
         isAlive = true;
         isMoved = false;
         isMultiplied = false;
         isEated = false;
     }
 
-    private static Map<Integer, Class<? extends Animal>> mapOfAnimals = new HashMap<>() {{
-        put(0, Wolf.class);
-        put(1, Boa.class);
-        put(2, Fox.class);
-        put(3, Bear.class);
-        put(4, Eagle.class);
-        put(5, Horse.class);
-        put(6, Deer.class);
-        put(7, Rabbit.class);
-        put(8, Mouse.class);
-        put(9, Goat.class);
-        put(10, Sheep.class);
-        put(11, Hog.class);
-        put(12, Buffalo.class);
-        put(13, Duck.class);
-        put(14, Caterpillar.class);
-    }};
+    private static List<Class<? extends Animal>> listOfAnimals = new ArrayList<>(Arrays.asList(Wolf.class, Boa.class,
+            Fox.class, Bear.class, Eagle.class, Horse.class, Deer.class, Rabbit.class, Mouse.class, Goat.class,
+            Sheep.class, Hog.class, Buffalo.class, Duck.class, Caterpillar.class));
 
     private static int[][] probabilityOfBeingEaten = {
             {-1, 0, 0, 0, 0, 10, 15, 60, 80, 60, 70, 15, 10, 40, 0, 0},
@@ -117,8 +107,8 @@ public abstract class Animal extends WildLife implements Cloneable, Movable, Mul
         return saturation - maxSaturation / 4;
     }
 
-    public static Map<Integer, Class<? extends Animal>> getMapOfAnimals() {
-        return mapOfAnimals;
+    public static List<Class<? extends Animal>> getListOfAnimals() {
+        return listOfAnimals;
     }
 
     public static int[][] getProbabilityOfBeingEaten() {

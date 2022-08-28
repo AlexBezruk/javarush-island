@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Statistics {
-    public static final String PATH_TO_INITIAL_STATISTICS = "resources/initialStatistics.json";
+    private static final String PATH_TO_INITIAL_STATISTICS = "resources/initialStatistics.json";
     private static int numberOfDeadAnimals;
     private static int numberOfAnimalsBorn;
     private Map<Class<? extends Animal>, Integer> animalsBySpecies;
@@ -39,7 +39,7 @@ public class Statistics {
         numberOfAnimalsBorn++;
     }
 
-    public static void zeroingNumberOfDeadAndBornAnimals() {
+    public static void reset() {
         numberOfAnimalsBorn = 0;
         numberOfDeadAnimals = 0;
     }
@@ -92,8 +92,8 @@ public class Statistics {
 
         for (int y = 0; y < island.getLocations().length; y++) {
             for (int x = 0; x < island.getLocations()[y].length; x++) {
-                Location pieceOfLand = island.getLocations()[y][x];
-                for (Animal animal : pieceOfLand.getAnimals()) {
+                Location location = island.getLocation(y, x);
+                for (Animal animal : location.getAnimals()) {
                     for (Class<? extends Animal> clazz : map.keySet()) {
                         if (clazz.equals(animal.getClass())) {
                             map.put(clazz, map.get(clazz) + 1);

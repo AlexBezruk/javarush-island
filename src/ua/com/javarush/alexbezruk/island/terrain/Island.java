@@ -1,8 +1,8 @@
 package ua.com.javarush.alexbezruk.island.terrain;
 
 public class Island {
-    private static final int LENGTH = 200;
-    private static final int WIDTH = 10;
+    private static final int LENGTH = 100;
+    private static final int WIDTH = 20;
 
     private Location[][] locations;
 

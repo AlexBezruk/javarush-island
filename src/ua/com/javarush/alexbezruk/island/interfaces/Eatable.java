@@ -1,5 +1,5 @@
 package ua.com.javarush.alexbezruk.island.interfaces;
 
-public interface Eatable<Animal> {
-    void eat(Animal animal);
+public interface Eatable {
+    void eat(Object o);
 }

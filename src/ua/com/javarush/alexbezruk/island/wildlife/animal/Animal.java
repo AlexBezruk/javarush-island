@@ -8,7 +8,6 @@ import ua.com.javarush.alexbezruk.island.logic.Simulation;
 import ua.com.javarush.alexbezruk.island.logic.NumberGenerator;
 import ua.com.javarush.alexbezruk.island.statistics.Statistics;
 import ua.com.javarush.alexbezruk.island.terrain.Island;
-import ua.com.javarush.alexbezruk.island.terrain.Location;
 import ua.com.javarush.alexbezruk.island.wildlife.WildLife;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.herbivores.*;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.predator.*;
@@ -16,6 +15,8 @@ import ua.com.javarush.alexbezruk.island.wildlife.animal.predator.*;
 import java.util.*;
 
 public abstract class Animal extends WildLife implements Cloneable, Movable, Multipliable, Eatable {
+    private static final int PERCENTAGE_DECREASE_IN_SATURATION_PER_DAY = 25;
+
     protected int x;
     protected int y;
 
@@ -42,17 +43,17 @@ public abstract class Animal extends WildLife implements Cloneable, Movable, Mul
         } catch (NumberFormatException e) {
             System.err.println("Неверный формат данных в файле properties " + e.getMessage());
         }
-        saturation = 0.75 * maxSaturation;
+        saturation = maxSaturation * (100 - PERCENTAGE_DECREASE_IN_SATURATION_PER_DAY) / 100;
         isAlive = true;
         isMoved = false;
         isMultiplied = false;
     }
 
-    private static List<Class<? extends Animal>> listOfAnimals = new ArrayList<>(Arrays.asList(Wolf.class, Boa.class,
+    private static final List<Class<? extends Animal>> listOfAnimals = new ArrayList<>(Arrays.asList(Wolf.class, Boa.class,
             Fox.class, Bear.class, Eagle.class, Horse.class, Deer.class, Rabbit.class, Mouse.class, Goat.class,
             Sheep.class, Hog.class, Buffalo.class, Duck.class, Caterpillar.class));
 
-    private static int[][] probabilityOfBeingEaten = {
+    private static final int[][] probabilityOfBeingEaten = {
             {-1, 0, 0, 0, 0, 10, 15, 60, 80, 60, 70, 15, 10, 40, 0, 0},
             {0, -1, 15, 0, 0, 0, 0, 20, 40, 0, 0, 0, 0, 10, 0, 0},
             {0, 0, -1, 0, 0, 0, 0, 70, 90, 0, 0, 0, 0, 60, 40, 0},
@@ -103,7 +104,7 @@ public abstract class Animal extends WildLife implements Cloneable, Movable, Mul
     }
 
     public void reducingSaturation() {
-        saturation -= maxSaturation / 4;
+        saturation -= maxSaturation * PERCENTAGE_DECREASE_IN_SATURATION_PER_DAY / 100;
     }
 
     public static List<Class<? extends Animal>> getListOfAnimals() {

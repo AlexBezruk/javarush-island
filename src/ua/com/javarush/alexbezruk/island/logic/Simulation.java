@@ -13,7 +13,8 @@ import java.util.*;
 
 public class Simulation {
     private static final int PARA = 2;
-    public static final int PROBABILITY_OF_BIRTH_OF_ANIMAL = 25;
+    private static final int PROBABILITY_OF_BIRTH_OF_ANIMAL = 25;
+    private static final int MAXIMUM_AMOUNT_OF_GRASS_EATEN_PER_DAY = 3;
     private static int day = 0;
     private static final String PATH_TO_DATA = "resources/data.properties";
     private static Properties initialData;
@@ -64,7 +65,13 @@ public class Simulation {
 
                 for (int i = 0; i < Animal.getListOfAnimals().size(); i++) {
                     Class<?> clazz = Animal.getListOfAnimals().get(i);
-                    int maxPopulation = Integer.parseInt(initialData.getProperty(clazz.getSimpleName() + ".maxPopulation"));
+
+                    int maxPopulation = 0;
+                    try {
+                        maxPopulation = Integer.parseInt(initialData.getProperty(clazz.getSimpleName() + ".maxPopulation"));
+                    } catch (NumberFormatException e) {
+                        System.err.println("Неверный формат данных в файле properties " + e.getMessage());
+                    }
 
                     for (int j = 0; j < NumberGenerator.randomNumber(maxPopulation); j++) {
                         try {
@@ -78,7 +85,13 @@ public class Simulation {
 
                 Collections.shuffle(location.getAnimals());
 
-                int maxPopulation = Integer.parseInt(initialData.getProperty("Plant.maxPopulation"));
+                int maxPopulation = 0;
+                try {
+                    maxPopulation = Integer.parseInt(initialData.getProperty("Plant.maxPopulation"));
+                } catch (NumberFormatException e) {
+                    System.err.println("Неверный формат данных в файле properties " + e.getMessage());
+                }
+
                 for (int i = 0; i < NumberGenerator.randomNumber(maxPopulation); i++) {
                     location.getPlants().add(new Plant());
                 }
@@ -87,12 +100,12 @@ public class Simulation {
     }
 
     private void oneDay(Island island) {
-        Statistics.zeroingNumberOfDeadAndBornAnimals();
+        Statistics.reset();
 
         for (int y = 0; y < Island.getWidth(); y++) {
             for (int x = 0; x < Island.getLength(); x++) {
-                List<Animal> animals = island.getLocations()[x][y].getAnimals();
-                List<Plant> plants = island.getLocations()[x][y].getPlants();
+                List<Animal> animals = island.getLocation(x, y).getAnimals();
+                List<Plant> plants = island.getLocation(x, y).getPlants();
                 for (int i = 0; i < animals.size(); i++) {
                     Animal animal = animals.get(i);
 
@@ -105,12 +118,12 @@ public class Simulation {
                     operations.add(1);
                     operations.add(2);
 
-                    for (int j = 0; j < operations.size(); j++) {
+                    while (!operations.isEmpty()) {
                         int randomNumber = NumberGenerator.randomNumber(operations.size() - 1);
                         switch (operations.get(randomNumber)) {
                             case 0 -> animalMove(animal, animals, island);
                             case 1 -> animalMultiply(animal, animals, island);
-                            case 2 -> animalEat(animal, animals, plants, island);
+                            case 2 -> animalEat(animal, animals, plants);
                         }
                         operations.remove(operations.get(randomNumber));
                     }
@@ -121,7 +134,7 @@ public class Simulation {
 
         reducingSaturation(island);
         removeDeadAnimals(island);
-        reducingSaturation(island);
+        resetLabels(island);
         plantGrowth(island);
     }
 
@@ -149,7 +162,7 @@ public class Simulation {
                 && numberOfAnimalsOfCertainType < animal.getMaxPopulation();
     }
 
-    private void animalEat(Animal animal, List<Animal> animals, List<Plant> plants, Island island) {
+    private void animalEat(Animal animal, List<Animal> animals, List<Plant> plants) {
         if (animal.isAlive) {
             int randomNumber = NumberGenerator.randomNumber(100);
             int key = Animal.getListOfAnimals().indexOf(animal.getClass());
@@ -173,7 +186,7 @@ public class Simulation {
             Class<? extends WildLife> clazz = list.get(randomNumber);
 
             if (clazz.equals(Plant.class)) {
-                for (int k = 0; k < 3; k++) {
+                for (int k = 0; k < NumberGenerator.randomNumber(MAXIMUM_AMOUNT_OF_GRASS_EATEN_PER_DAY); k++) {
                     if (animal.getSaturation() < animal.getMaxSaturation() && !plants.isEmpty()) {
                         double newSaturation = animal.getSaturation() + plants.remove(0).getWeight();
                         if (newSaturation > animal.getMaxSaturation()) {
@@ -183,14 +196,14 @@ public class Simulation {
                     }
                 }
             } else {
-                for (int j = 0; j < animals.size(); j++) {
-                    if (animals.get(j).isAlive && animals.get(j).getClass().equals(clazz)) {
-                        double newSaturation = animal.getSaturation() + animals.get(j).getWeight();
+                for (Animal value : animals) {
+                    if (value.isAlive && value.getClass().equals(clazz)) {
+                        double newSaturation = animal.getSaturation() + value.getWeight();
                         if (newSaturation > animal.getMaxSaturation()) {
                             newSaturation = animal.getMaxSaturation();
                         }
                         animal.setSaturation(newSaturation);
-                        animal.eat(animals.get(j));
+                        animal.eat(value);
                         break;
                     }
                 }
@@ -202,12 +215,10 @@ public class Simulation {
         for (int y = 0; y < Island.getWidth(); y++) {
             for (int x = 0; x < Island.getLength(); x++) {
                 List<Animal> animals = island.getLocation(x, y).getAnimals();
-                for (int i = 0; i < animals.size(); i++) {
-                    Animal animal = animals.get(i);
+                for (Animal animal : animals) {
                     animal.reducingSaturation();
                     if (animal.getSaturation() < 0) {
                         animal.isAlive = false;
-
                     }
                 }
             }
@@ -218,12 +229,10 @@ public class Simulation {
         for (int y = 0; y < Island.getWidth(); y++) {
             for (int x = 0; x < Island.getLength(); x++) {
                 List<Animal> animals = island.getLocation(x, y).getAnimals();
-                for (int i = 0; i < animals.size(); i++) {
-                    Animal animal = animals.get(i);
+                for (Animal animal : new ArrayList<>(animals)) {
                     if (!animal.isAlive) {
-                        animals.remove(i);
+                        animals.remove(animal);
                         Statistics.incrementNumberOfDeadAnimals();
-                        i--;
                     }
                 }
             }
@@ -234,8 +243,7 @@ public class Simulation {
         for (int y = 0; y < Island.getWidth(); y++) {
             for (int x = 0; x < Island.getLength(); x++) {
                 List<Animal> animals = island.getLocation(x, y).getAnimals();
-                for (int i = 0; i < animals.size(); i++) {
-                    Animal animal = animals.get(i);
+                for (Animal animal : animals) {
                     animal.isMoved = false;
                 }
             }
@@ -245,11 +253,11 @@ public class Simulation {
     private void plantGrowth(Island island) {
         for (int y = 0; y < Island.getWidth(); y++) {
             for (int x = 0; x < Island.getLength(); x++) {
-                Location pieceOfLand = island.getLocations()[x][y];
+                Location location = island.getLocations()[x][y];
 
-                int necessaryGrowth = NumberGenerator.randomNumber(Plant.getMaxPopulation() - pieceOfLand.getPlants().size());
+                int necessaryGrowth = NumberGenerator.randomNumber(Plant.getMaxPopulation()) - location.getPlants().size();
                 for (int i = 0; i < necessaryGrowth; i++) {
-                    pieceOfLand.getPlants().add(new Plant());
+                    location.getPlants().add(new Plant());
                 }
             }
         }

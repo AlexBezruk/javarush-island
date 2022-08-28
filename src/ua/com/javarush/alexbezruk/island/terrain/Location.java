@@ -6,11 +6,11 @@ import ua.com.javarush.alexbezruk.island.wildlife.plant.Plant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PieceOfLand {
+public class Location {
     List<Animal> animals;
     List<Plant> plants;
 
-    public PieceOfLand() {
+    public Location() {
         animals = new ArrayList<>();
         plants = new ArrayList<>();
     }
@@ -23,11 +23,15 @@ public class PieceOfLand {
         return plants;
     }
 
-    @Override
-    public String toString() {
-        return "PieceOfLand{" +
-                "animals=" + animals +
-                ", plants=" + plants.size() +
-                '}';
+    public int numberOfAnimalsOfCertainType (Class<? extends Animal> clazz) {
+        int count = 0;
+
+        for (Animal animal : getAnimals()) {
+            if (animal.getClass().equals(clazz)) {
+                count++;
+            }
+        }
+
+        return count;
     }
 }

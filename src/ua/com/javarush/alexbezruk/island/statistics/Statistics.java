@@ -2,7 +2,7 @@ package ua.com.javarush.alexbezruk.island.statistics;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ua.com.javarush.alexbezruk.island.terrain.Island;
-import ua.com.javarush.alexbezruk.island.terrain.PieceOfLand;
+import ua.com.javarush.alexbezruk.island.terrain.Location;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.Animal;
 
 import java.io.File;
@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Statistics {
-    public static final String PATH_TO_INITIAL_STATISTICS = "src/ua/com/javarush/alexbezruk/island/resources/initialStatistics.json";
+    public static final String PATH_TO_INITIAL_STATISTICS = "resources/initialStatistics.json";
     private static int numberOfDeadAnimals;
     private static int numberOfAnimalsBorn;
     private Map<Class<? extends Animal>, Integer> animalsBySpecies;
@@ -90,9 +90,9 @@ public class Statistics {
             map.put(clazz, 0);
         }
 
-        for (int y = 0; y < island.get().length; y++) {
-            for (int x = 0; x < island.get()[y].length; x++) {
-                PieceOfLand pieceOfLand = island.get()[y][x];
+        for (int y = 0; y < island.getLocations().length; y++) {
+            for (int x = 0; x < island.getLocations()[y].length; x++) {
+                Location pieceOfLand = island.getLocations()[y][x];
                 for (Animal animal : pieceOfLand.getAnimals()) {
                     for (Class<? extends Animal> clazz : map.keySet()) {
                         if (clazz.equals(animal.getClass())) {

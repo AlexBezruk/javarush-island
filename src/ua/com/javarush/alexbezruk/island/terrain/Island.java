@@ -1,17 +1,16 @@
 package ua.com.javarush.alexbezruk.island.terrain;
 
 public class Island {
+    private static final int LENGTH = 200;
+    private static final int WIDTH = 10;
 
-    private static final int LENGTH = 100;
-    private static final int WIDTH = 20;
-
-    private PieceOfLand[][] island;
+    private Location[][] locations;
 
     public Island() {
-        island = new PieceOfLand[LENGTH][WIDTH];
-        for (int y = 0; y < island.length; y++) {
-            for (int x = 0; x < island[y].length; x++) {
-                island[y][x] = new PieceOfLand();
+        locations = new Location[LENGTH][WIDTH];
+        for (int y = 0; y < locations.length; y++) {
+            for (int x = 0; x < locations[y].length; x++) {
+                locations[y][x] = new Location();
             }
         }
     }
@@ -24,7 +23,11 @@ public class Island {
         return LENGTH;
     }
 
-    public PieceOfLand[][] get() {
-        return island;
+    public Location[][] getLocations() {
+        return locations;
+    }
+
+    public Location getLocation(int y, int x) {
+        return locations[y][x];
     }
 }

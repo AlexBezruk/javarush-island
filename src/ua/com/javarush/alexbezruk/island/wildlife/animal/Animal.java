@@ -13,6 +13,8 @@ import ua.com.javarush.alexbezruk.island.wildlife.animal.herbivores.*;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.predator.*;
 
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class Animal extends WildLife implements Cloneable, Movable, Multipliable, Eatable {
     private static final int PERCENTAGE_DECREASE_IN_SATURATION_PER_DAY = 25;
@@ -29,6 +31,7 @@ public abstract class Animal extends WildLife implements Cloneable, Movable, Mul
     public boolean isAlive;
     public boolean isMoved;
     public boolean isMultiplied;
+    public Lock lock = new ReentrantLock();
 
     public Animal(int x, int y) {
         this.x = x;

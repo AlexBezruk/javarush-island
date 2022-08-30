@@ -5,14 +5,15 @@ import ua.com.javarush.alexbezruk.island.wildlife.plant.Plant;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Location {
-    List<Animal> animals;
-    List<Plant> plants;
+    private List<Animal> animals;
+    private List<Plant> plants;
 
     public Location() {
-        animals = new ArrayList<>();
-        plants = new ArrayList<>();
+        animals = new CopyOnWriteArrayList<>();
+        plants = new CopyOnWriteArrayList<>();
     }
 
     public List<Animal> getAnimals() {

@@ -22,8 +22,16 @@ public class Simulation {
     private static final String PATH_TO_DATA = "resources/data.properties";
     private static final Properties initialData;
 
+    private final Island island;
+    private final Menu menu;
+
     static {
         initialData = getProperties();
+    }
+
+    public Simulation() {
+        island = new Island();
+        menu = new Menu(island);
     }
 
     public static Properties getInitialData() {
@@ -32,21 +40,20 @@ public class Simulation {
 
     public static void start() {
         Simulation simulation = new Simulation();
-        Island island = new Island();
-        simulation.settlement(island);
+        simulation.settlement();
         System.out.println("Остров создан и заселен животными");
 
-        Statistics initialStatistics = new Statistics(island);
+        Statistics initialStatistics = new Statistics(simulation.island);
         initialStatistics.outputGeneral();
         initialStatistics.saveInitialStateOfIsland();
 
         System.out.println("\nЗапускаем симуляцию жизни острова...\n");
 
         while (true) {
-            simulation.oneDay(island);
+            simulation.oneDay();
             day++;
             System.out.printf("Прошел день №%d", day);
-            Menu.output(island);
+            simulation.menu.output();
         }
     }
 
@@ -61,7 +68,7 @@ public class Simulation {
         return properties;
     }
 
-    private void settlement(Island island) {
+    private void settlement() {
         for (int y = 0; y < Island.getWidth(); y++) {
             for (int x = 0; x < Island.getLength(); x++) {
                 Location location = island.getLocation(x, y);
@@ -102,7 +109,7 @@ public class Simulation {
         }
     }
 
-    private void oneDay(Island island) {
+    private void oneDay() {
         Statistics.reset();
         ExecutorService executor = Executors.newFixedThreadPool(Island.getLength() * Island.getWidth());
         for (int y = 0; y < Island.getWidth(); y++) {
@@ -115,7 +122,7 @@ public class Simulation {
                     for (int i = 0; i < animals.size(); i++) {
                         Animal animal = animals.get(i);
 
-                        if (animal.isMoved) {
+                        if (animal.isMoved()) {
                             continue;
                         }
 
@@ -128,47 +135,42 @@ public class Simulation {
                         while (!operations.isEmpty()) {
                             int randomNumber = NumberGenerator.randomNumber(operations.size() - 1);
                             switch (operations.get(randomNumber)) {
-                                case 0 -> animalMove(animal, animals, island);
-                                case 1 -> animalMultiply(animal, animals, island);
+                                case 0 -> animalMove(animal, animals);
+                                case 1 -> animalMultiply(animal, animals);
                                 case 2 -> animalEat(animal, animals, plants);
                             }
                             operations.remove(operations.get(randomNumber));
                         }
-                        animal.isMoved = true;
+                        animal.setMoved(true);
                         animal.lock.unlock();
                     }
                 });
             }
         }
 
+        executor.shutdown();
         try {
-            executor.awaitTermination(1, TimeUnit.SECONDS);
+            executor.awaitTermination(100, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            System.err.println(e.getMessage());
-        } finally {
-            executor.shutdown();
+            System.err.println("Поток прерван " + e.getMessage());
         }
 
-        reducingSaturation(island);
-        removeDeadAnimals(island);
-        resetLabels(island);
-        plantGrowth(island);
+        reducingSaturation();
+        removeDeadAnimals();
+        resetLabels();
+        plantGrowth();
     }
 
-    private void oneDayOnOneLocation(Island island, int y, int x) {
-
-    }
-
-    private void animalMove(Animal animal, List<Animal> animals, Island island) {
-        if (animal.isAlive ) {
+    private void animalMove(Animal animal, List<Animal> animals) {
+        if (animal.isAlive()) {
             animals.remove(animal);
             animal.move();
             island.getLocation(animal.getX(), animal.getY()).getAnimals().add(animal);
         }
     }
 
-    private void animalMultiply(Animal animal, List<Animal> animals, Island island) {
-        if (animal.isAlive && !animal.isMultiplied) {
+    private void animalMultiply(Animal animal, List<Animal> animals) {
+        if (animal.isAlive() && !animal.isMultiplied()) {
             Location location = island.getLocation(animal.getX(), animal.getY());
             int numberOfAnimalsOfCertainType = location.numberOfAnimalsOfCertainType(animal.getClass());
             if (isCheckingBirthOfAnimal(animal, numberOfAnimalsOfCertainType)) {
@@ -184,7 +186,7 @@ public class Simulation {
     }
 
     private void animalEat(Animal animal, List<Animal> animals, List<Plant> plants) {
-        if (animal.isAlive) {
+        if (animal.isAlive()) {
             int randomNumber = NumberGenerator.randomNumber(100);
             int key = Animal.getListOfAnimals().indexOf(animal.getClass());
 
@@ -218,7 +220,7 @@ public class Simulation {
                 }
             } else {
                 for (Animal animalVictim : animals) {
-                    if (animalVictim.isAlive && animalVictim.getClass().equals(clazz) && animalVictim.lock.tryLock()) {
+                    if (animalVictim.isAlive() && animalVictim.getClass().equals(clazz) && animalVictim.lock.tryLock()) {
                         double newSaturation = animal.getSaturation() + animalVictim.getWeight();
                         if (newSaturation > animal.getMaxSaturation()) {
                             newSaturation = animal.getMaxSaturation();
@@ -233,26 +235,26 @@ public class Simulation {
         }
     }
 
-    private void reducingSaturation(Island island) {
+    private void reducingSaturation() {
         for (int y = 0; y < Island.getWidth(); y++) {
             for (int x = 0; x < Island.getLength(); x++) {
                 List<Animal> animals = island.getLocation(x, y).getAnimals();
                 for (Animal animal : animals) {
                     animal.reducingSaturation();
                     if (animal.getSaturation() < 0) {
-                        animal.isAlive = false;
+                        animal.setAlive(false);
                     }
                 }
             }
         }
     }
 
-    private void removeDeadAnimals(Island island) {
+    private void removeDeadAnimals() {
         for (int y = 0; y < Island.getWidth(); y++) {
             for (int x = 0; x < Island.getLength(); x++) {
                 List<Animal> animals = island.getLocation(x, y).getAnimals();
                 for (Animal animal : new ArrayList<>(animals)) {
-                    if (!animal.isAlive) {
+                    if (!animal.isAlive()) {
                         animals.remove(animal);
                         Statistics.incrementNumberOfDeadAnimals();
                     }
@@ -261,18 +263,18 @@ public class Simulation {
         }
     }
 
-    private void resetLabels(Island island) {
+    private void resetLabels() {
         for (int y = 0; y < Island.getWidth(); y++) {
             for (int x = 0; x < Island.getLength(); x++) {
                 List<Animal> animals = island.getLocation(x, y).getAnimals();
                 for (Animal animal : animals) {
-                    animal.isMoved = false;
+                    animal.setMoved(false);
                 }
             }
         }
     }
 
-    private void plantGrowth(Island island) {
+    private void plantGrowth() {
         for (int y = 0; y < Island.getWidth(); y++) {
             for (int x = 0; x < Island.getLength(); x++) {
                 Location location = island.getLocations()[x][y];

@@ -7,13 +7,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class Menu {
+public record Menu(Island island) {
     private static final String NUMBER_FORMAT_INFORMATION = "Введена информация неверного формата, повторите ввод";
     private static final String IO_INFORMATION = "Ошибка при чтении данных с консоли: ";
     private static final String CHOOSING_ACTION = "\nВыбери необходимое действие:";
     private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-    public static void output(Island island) {
+    public void output() {
         int number = 0;
         System.out.println(CHOOSING_ACTION);
         System.out.println("1 - Симуляция еще одного дня жизни острова");
@@ -23,23 +23,24 @@ public class Menu {
             number = Integer.parseInt(reader.readLine());
         } catch (NumberFormatException e) {
             System.out.println(NUMBER_FORMAT_INFORMATION);
-            output(island);
+            output();
         } catch (IOException e) {
             System.err.println(IO_INFORMATION + e.getMessage());
-            output(island);
+            output();
         }
         switch (number) {
-            case 1 -> {}
-            case 2 -> statisticsOutput(island);
+            case 1 -> {
+            }
+            case 2 -> statisticsOutput();
             case 3 -> System.exit(0);
             default -> {
                 System.out.println(NUMBER_FORMAT_INFORMATION);
-                output(island);
+                output();
             }
         }
     }
 
-    public static void statisticsOutput(Island island) {
+    public void statisticsOutput() {
         int number = 0;
         Statistics statistics = new Statistics(island);
         System.out.println(CHOOSING_ACTION);
@@ -51,21 +52,21 @@ public class Menu {
             number = Integer.parseInt(reader.readLine());
         } catch (NumberFormatException e) {
             System.out.println(NUMBER_FORMAT_INFORMATION);
-            statisticsOutput(island);
+            statisticsOutput();
         } catch (IOException e) {
             System.err.println(IO_INFORMATION + e.getMessage());
-            statisticsOutput(island);
+            statisticsOutput();
         }
         switch (number) {
             case 1 -> statistics.outputGeneral();
             case 2 -> statistics.outputNumberOfBornAndDeadAnimals();
             case 3 -> statistics.outputAnimalsGrowth();
-            case 4 -> output(island);
+            case 4 -> output();
             default -> {
                 System.out.println(NUMBER_FORMAT_INFORMATION);
-                statisticsOutput(island);
+                statisticsOutput();
             }
         }
-        output(island);
+        output();
     }
 }

@@ -3,13 +3,12 @@ package ua.com.javarush.alexbezruk.island.terrain;
 import ua.com.javarush.alexbezruk.island.wildlife.animal.Animal;
 import ua.com.javarush.alexbezruk.island.wildlife.plant.Plant;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Location {
-    private List<Animal> animals;
-    private List<Plant> plants;
+    private final List<Animal> animals;
+    private final List<Plant> plants;
 
     public Location() {
         animals = new CopyOnWriteArrayList<>();

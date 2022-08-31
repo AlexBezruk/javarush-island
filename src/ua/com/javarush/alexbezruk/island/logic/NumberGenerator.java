@@ -1,10 +1,9 @@
 package ua.com.javarush.alexbezruk.island.logic;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class NumberGenerator {
     public static int randomNumber(int max) {
-        Random random = new Random();
-        return random.nextInt(max + 1);
+        return ThreadLocalRandom.current().nextInt(max + 1);
     }
 }

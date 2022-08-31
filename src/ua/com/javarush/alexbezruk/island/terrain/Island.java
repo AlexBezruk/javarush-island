@@ -4,7 +4,7 @@ public class Island {
     private static final int LENGTH = 100;
     private static final int WIDTH = 20;
 
-    private Location[][] locations;
+    private final Location[][] locations;
 
     public Island() {
         locations = new Location[LENGTH][WIDTH];

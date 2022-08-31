@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class Plant extends WildLife {
     private double weight;
-    private static int maxPopulation;
+    private static final int maxPopulation;
 
     static {
         Properties properties = Simulation.getInitialData();

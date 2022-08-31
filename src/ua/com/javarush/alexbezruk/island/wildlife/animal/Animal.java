@@ -16,8 +16,9 @@ import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public abstract class Animal extends WildLife implements Cloneable, Movable, Multipliable, Eatable {
+public abstract class Animal extends WildLife implements Cloneable, Movable, Multipliable<Animal>, Eatable {
     private static final int PERCENTAGE_DECREASE_IN_SATURATION_PER_DAY = 25;
+    public Lock lock = new ReentrantLock();
 
     protected int x;
     protected int y;
@@ -28,12 +29,11 @@ public abstract class Animal extends WildLife implements Cloneable, Movable, Mul
     protected double maxSaturation;
     protected int maxPopulation;
 
-    public boolean isAlive;
-    public boolean isMoved;
-    public boolean isMultiplied;
-    public Lock lock = new ReentrantLock();
+    private boolean isAlive;
+    private boolean isMoved;
+    private boolean isMultiplied;
 
-    public Animal(int x, int y) {
+    protected Animal(int x, int y) {
         this.x = x;
         this.y = y;
         Properties properties = Simulation.getInitialData();
@@ -73,6 +73,30 @@ public abstract class Animal extends WildLife implements Cloneable, Movable, Mul
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 90, 100},
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 100},
     };
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    public void setAlive(boolean alive) {
+        isAlive = alive;
+    }
+
+    public boolean isMoved() {
+        return isMoved;
+    }
+
+    public void setMoved(boolean moved) {
+        isMoved = moved;
+    }
+
+    public boolean isMultiplied() {
+        return isMultiplied;
+    }
 
     public int getX() {
         return x;

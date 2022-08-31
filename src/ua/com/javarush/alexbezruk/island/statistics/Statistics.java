@@ -15,9 +15,11 @@ public class Statistics {
     private static final String PATH_TO_INITIAL_STATISTICS = "resources/initialStatistics.json";
     private static int numberOfDeadAnimals;
     private static int numberOfAnimalsBorn;
+
+    private final ObjectMapper mapper = new ObjectMapper();
+    private final File file = new File(PATH_TO_INITIAL_STATISTICS);
+
     private Map<Class<? extends Animal>, Integer> animalsBySpecies;
-    ObjectMapper mapper = new ObjectMapper();
-    File file = new File(PATH_TO_INITIAL_STATISTICS);
 
     public Statistics() {
     }

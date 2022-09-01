@@ -14,7 +14,7 @@ import java.util.Map;
 public class Statistics {
     private static final String PATH_TO_INITIAL_STATISTICS = "resources/initialStatistics.json";
     private static int numberOfDeadAnimals;
-    private static int numberOfAnimalsBorn;
+    private static volatile int numberOfAnimalsBorn;
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final File file = new File(PATH_TO_INITIAL_STATISTICS);
@@ -37,7 +37,7 @@ public class Statistics {
         numberOfDeadAnimals++;
     }
 
-    public static void incrementNumberOfAnimalsBorn() {
+    public static synchronized void incrementNumberOfAnimalsBorn() {
         numberOfAnimalsBorn++;
     }
 

@@ -111,6 +111,7 @@ public class Simulation {
 
     private void oneDay() {
         Statistics.reset();
+
         ExecutorService executor = Executors.newFixedThreadPool(Island.getLength() * Island.getWidth());
         for (int y = 0; y < Island.getWidth(); y++) {
             for (int x = 0; x < Island.getLength(); x++) {

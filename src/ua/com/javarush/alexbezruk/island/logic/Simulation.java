@@ -127,33 +127,7 @@ public class Simulation {
                 Location location = island.getLocation(x, y);
 
                 executor.submit(() -> {
-                    List<Animal> animals = location.getAnimals();
-                    List<Plant> plants = location.getPlants();
-                    for (int i = 0; i < animals.size(); i++) {
-                        Animal animal = animals.get(i);
-
-                        if (animal.isMoved()) {
-                            continue;
-                        }
-
-                        List<Integer> operations = new ArrayList<>();
-                        operations.add(0);
-                        operations.add(1);
-                        operations.add(2);
-
-                        animal.lock.lock();
-                        while (!operations.isEmpty()) {
-                            int randomNumber = NumberGenerator.randomNumber(operations.size() - 1);
-                            switch (operations.get(randomNumber)) {
-                                case 0 -> animalMove(animal, animals);
-                                case 1 -> animalMultiply(animal, animals);
-                                case 2 -> animalEat(animal, animals, plants);
-                            }
-                            operations.remove(operations.get(randomNumber));
-                        }
-                        animal.setMoved(true);
-                        animal.lock.unlock();
-                    }
+                    oneDayOnLocation(location);
                 });
             }
         }
@@ -169,6 +143,36 @@ public class Simulation {
         removeDeadAnimals();
         resetLabels();
         plantGrowth();
+    }
+
+    private void oneDayOnLocation(Location location) {
+        List<Animal> animals = location.getAnimals();
+        List<Plant> plants = location.getPlants();
+        for (int i = 0; i < animals.size(); i++) {
+            Animal animal = animals.get(i);
+
+            if (animal.isMoved()) {
+                continue;
+            }
+
+            List<Integer> operations = new ArrayList<>();
+            operations.add(0);
+            operations.add(1);
+            operations.add(2);
+
+            animal.lock.lock();
+            while (!operations.isEmpty()) {
+                int randomNumber = NumberGenerator.randomNumber(operations.size() - 1);
+                switch (operations.get(randomNumber)) {
+                    case 0 -> animalMove(animal, animals);
+                    case 1 -> animalMultiply(animal, animals);
+                    case 2 -> animalEat(animal, animals, plants);
+                }
+                operations.remove(operations.get(randomNumber));
+            }
+            animal.setMoved(true);
+            animal.lock.unlock();
+        }
     }
 
     private void animalMove(Animal animal, List<Animal> animals) {

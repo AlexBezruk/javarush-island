@@ -109,10 +109,9 @@ public class Statistics {
     }
 
     private int countingTotalNumberOfAnimals() {
-        int sum = 0;
-        for (Integer count : animalsBySpecies.values()) {
-            sum += count;
-        }
-        return sum;
+        return animalsBySpecies.values()
+                .stream()
+                .mapToInt(i -> i)
+                .sum();
     }
 }

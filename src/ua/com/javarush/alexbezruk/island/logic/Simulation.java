@@ -83,7 +83,7 @@ public class Simulation {
 
                     int maxPopulation = 0;
                     try {
-                        maxPopulation = Integer.parseInt(initialData.getProperty(clazz.getSimpleName() + ".maxPopulation"));
+                        maxPopulation = getMaxPopulation(clazz);
                     } catch (NumberFormatException e) {
                         System.err.println("Неверный формат данных в файле properties " + e.getMessage());
                     }
@@ -102,7 +102,7 @@ public class Simulation {
 
                 int maxPopulation = 0;
                 try {
-                    maxPopulation = Integer.parseInt(initialData.getProperty("Plant.maxPopulation"));
+                    maxPopulation = getMaxPopulation(Plant.class);
                 } catch (NumberFormatException e) {
                     System.err.println("Неверный формат данных в файле properties " + e.getMessage());
                 }
@@ -112,6 +112,10 @@ public class Simulation {
                 }
             }
         }
+    }
+
+    private int getMaxPopulation(Class<?> clazz) {
+        return Integer.parseInt(initialData.getProperty(clazz.getSimpleName() + ".maxPopulation"));
     }
 
     private void oneDay() {

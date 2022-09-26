@@ -45,7 +45,7 @@ public class Simulation {
 
     public static void start() {
         Simulation simulation = new Simulation();
-        simulation.settlement();
+        simulation.fillIsland();
         System.out.println("Остров создан и заселен животными");
 
         Statistics initialStatistics = new Statistics(simulation.island);
@@ -73,7 +73,7 @@ public class Simulation {
         return properties;
     }
 
-    private void settlement() {
+    private void fillIsland() {
         for (int y = 0; y < Island.getWidth(); y++) {
             for (int x = 0; x < Island.getLength(); x++) {
                 Location location = island.getLocation(x, y);

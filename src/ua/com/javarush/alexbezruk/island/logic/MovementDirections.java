@@ -1,6 +1,6 @@
 package ua.com.javarush.alexbezruk.island.logic;
 
-public enum DirectionsOfMovement {
+public enum MovementDirections {
     LEFT,
     UP,
     RIGHT,

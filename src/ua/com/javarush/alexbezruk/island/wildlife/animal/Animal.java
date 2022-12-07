@@ -3,7 +3,7 @@ package ua.com.javarush.alexbezruk.island.wildlife.animal;
 import ua.com.javarush.alexbezruk.island.interfaces.Eatable;
 import ua.com.javarush.alexbezruk.island.interfaces.Movable;
 import ua.com.javarush.alexbezruk.island.interfaces.Multipliable;
-import ua.com.javarush.alexbezruk.island.logic.DirectionsOfMovement;
+import ua.com.javarush.alexbezruk.island.logic.MovementDirections;
 import ua.com.javarush.alexbezruk.island.logic.Simulation;
 import ua.com.javarush.alexbezruk.island.logic.NumberGenerator;
 import ua.com.javarush.alexbezruk.island.statistics.Statistics;
@@ -145,12 +145,12 @@ public abstract class Animal extends WildLife implements Cloneable, Movable, Mul
     @Override
     public void move() {
         for (int i = 0; i < getSpeed(); i++) {
-            List<DirectionsOfMovement> possibleDirectionsOfMovement = calculationOfPossibleDirectionsOfMovement();
-            if (possibleDirectionsOfMovement.isEmpty()) {
+            List<MovementDirections> possibleMovementDirections = calculationOfPossibleDirectionsOfMovement();
+            if (possibleMovementDirections.isEmpty()) {
                 return;
             }
-            int randomNumber = NumberGenerator.randomNumber(possibleDirectionsOfMovement.size() - 1);
-            switch (possibleDirectionsOfMovement.get(randomNumber)) {
+            int randomNumber = NumberGenerator.randomNumber(possibleMovementDirections.size() - 1);
+            switch (possibleMovementDirections.get(randomNumber)) {
                 case LEFT -> moveLeft();
                 case UP -> moveUp();
                 case RIGHT -> moveRight();
@@ -180,21 +180,21 @@ public abstract class Animal extends WildLife implements Cloneable, Movable, Mul
         animal.isAlive = false;
     }
 
-    private List<DirectionsOfMovement> calculationOfPossibleDirectionsOfMovement() {
-        List<DirectionsOfMovement> possibleDirectionsOfMovement = new ArrayList<>();
+    private List<MovementDirections> calculationOfPossibleDirectionsOfMovement() {
+        List<MovementDirections> possibleMovementDirections = new ArrayList<>();
         if (x != 0) {
-            possibleDirectionsOfMovement.add(DirectionsOfMovement.LEFT);
+            possibleMovementDirections.add(MovementDirections.LEFT);
         }
         if (y != 0) {
-            possibleDirectionsOfMovement.add(DirectionsOfMovement.UP);
+            possibleMovementDirections.add(MovementDirections.UP);
         }
         if (x != Island.getLength() - 1) {
-            possibleDirectionsOfMovement.add(DirectionsOfMovement.RIGHT);
+            possibleMovementDirections.add(MovementDirections.RIGHT);
         }
         if (y != Island.getWidth() - 1) {
-            possibleDirectionsOfMovement.add(DirectionsOfMovement.DOWN);
+            possibleMovementDirections.add(MovementDirections.DOWN);
         }
-        return possibleDirectionsOfMovement;
+        return possibleMovementDirections;
     }
 
     private void moveLeft() {

@@ -76,7 +76,6 @@ $ java -jar ./out/artifacts/island.jar
 - Многопоточность: `ScheduledExecutorService`, `ExecutorService`
 - ООП: абстракции, интерфейсы, наследование
 - Статистика: консольный вывод
-- Псевдографика: Unicode-символы животных
 
 ---
 
